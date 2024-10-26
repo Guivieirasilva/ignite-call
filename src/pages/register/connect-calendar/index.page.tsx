@@ -3,6 +3,7 @@ import { Container, Form, Header } from "../styles";
 import { z } from "zod";
 import { ArrowRight } from "phosphor-react";
 import { ConnectBox, ConnectItem } from "./styles";
+import { signIn, useSession } from "next-auth/react";
 
 const registerFormSchema = z.object({
   username: z
@@ -20,6 +21,10 @@ const registerFormSchema = z.object({
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Register() {
+
+  const session = useSession()
+
+
   return (
     <Container>
       <Header>
@@ -34,7 +39,11 @@ export default function Register() {
       <ConnectBox>
         <ConnectItem>
           <Text>Google Calendar</Text>
-          <Button size="sm" variant="secondary">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => signIn("google")}
+          >
             Conectar
             <ArrowRight />
           </Button>
