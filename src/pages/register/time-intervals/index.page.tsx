@@ -16,7 +16,7 @@ import {
 } from "./style";
 import { ArrowRight } from "phosphor-react";
 import { z } from "zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { getWeekDays } from "../../../utils/getWeekDays";
 
 // interface timeIntervalFormSchema = z.object({
@@ -30,6 +30,7 @@ export default function TimeIntervals() {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { isSubmitting, errors },
   } = useForm({
     defaultValues: {
@@ -44,13 +45,14 @@ export default function TimeIntervals() {
       ],
     },
   });
+  const weekDays = getWeekDays();
 
   const { fields } = useFieldArray({
     control,
     name: "intervals",
   });
 
-  const weekDays = getWeekDays();
+  const interVals = watch('intervals')
 
   async function handleSetTImeIntervals() {}
 
@@ -71,7 +73,16 @@ export default function TimeIntervals() {
             return (
               <IntervalItem key={field.id}>
                 <IntervalDay>
-                  <Checkbox  />
+                  <Controller
+                    name={`intervals.${idx}.enable`}
+                    control={control}
+                    render={({field}) => {
+                      return <Checkbox checked={field.value} onCheckedChange={(checked) => {
+                        field.onChange(checked === true)
+                      }} />;
+                    }}
+                    
+                  />
                   <Text>{weekDays[field.weekDay]}</Text>{" "}
                 </IntervalDay>
                 <IntervalInput>
@@ -82,6 +93,7 @@ export default function TimeIntervals() {
                     onPointerEnterCapture={undefined}
                     onPointerLeaveCapture={undefined}
                     crossOrigin={undefined}
+                    disabled={interVals[idx].enable === false}
                     {...register(`intervals.${idx}.startTime`)}
                   />
                   <TextInput
@@ -91,6 +103,7 @@ export default function TimeIntervals() {
                     onPointerEnterCapture={undefined}
                     onPointerLeaveCapture={undefined}
                     crossOrigin={undefined}
+                    disabled={interVals[idx].enable === false}
                     {...register(`intervals.${idx}.endTime`)}
                   />
                 </IntervalInput>
