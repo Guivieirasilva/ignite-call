@@ -1,4 +1,11 @@
-import { Button, Heading, MultiStep, Text, TextArea } from "@ignite-ui/react";
+import {
+  Avatar,
+  Button,
+  Heading,
+  MultiStep,
+  Text,
+  TextArea,
+} from "@ignite-ui/react";
 import { ArrowRight } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +16,8 @@ import { useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { buildNextAuthOptions } from "../../api/auth/[...nextauth].api";
+import { api } from "../../../lib/axios";
+import { useRouter } from "next/router";
 
 const upfateProfileSchema = z.object({
   bio: z.string(),
@@ -26,10 +35,15 @@ export default function UpdateProfile() {
   });
 
   const session = useSession();
+  const router = useRouter()
 
-  console.log(session);
+  async function handleUpdateProfile(data: UpdateProfileData) {
+    await api.put("/users/profile", {
+      bio: data.bio,
+    });
 
-  async function handleUpdateProfile(data: UpdateProfileData) {}
+    await router.push(`/schedule/${session.data?.user.username}`);
+  }
 
   return (
     <Container>
@@ -45,6 +59,10 @@ export default function UpdateProfile() {
       <ProfileBox as="form" onSubmit={handleSubmit(handleUpdateProfile)}>
         <label>
           <Text>Foto de perfil</Text>
+          <Avatar
+            src={session.data?.user.avatar_url}
+            alt={session.data?.user.name}
+          />
         </label>
         <label>
           <Text size="sm">Sobre você</Text>
@@ -63,16 +81,15 @@ export default function UpdateProfile() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-
-    const session = await getServerSession(
-      req,
-      res,
-      buildNextAuthOptions(req, res)
-    );
+  const session = await getServerSession(
+    req,
+    res,
+    buildNextAuthOptions(req, res)
+  );
 
   return {
     props: {
-      session
+      session,
     },
   };
 };
