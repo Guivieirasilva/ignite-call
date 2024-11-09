@@ -8,21 +8,42 @@ import {
   CalendarTitle,
 } from "./styles";
 import { getWeekDays } from "../../utils/get-week-days";
+import { useState } from "react";
+import dayjs from "dayjs";
 
 export function Calendar() {
+  const [currentDate, setCurrentDate] = useState(() => {
+    return dayjs().set("date", 1);
+  });
+
+  function handlePreviusMonth() {
+    const previousMonthDate = currentDate.subtract(1, "month");
+
+    setCurrentDate(previousMonthDate);
+  }
+
+  function handleNextMonth() {
+        const previousMonthDate = currentDate.add(1, "month");
+
+        setCurrentDate(previousMonthDate);
+  }
+
   const shortWeekDays = getWeekDays({ short: true });
+
+  const currentMonth = currentDate.format("MMMM");
+  const currentYear = currentDate.format("YYYY");
 
   return (
     <CalendarContainer>
       <CalendarHeader>
         <CalendarTitle>
-          Novembro <span>2024</span>
+          {currentMonth} <span>{currentYear}</span>
         </CalendarTitle>
         <CalendarActions>
-          <button>
+          <button onClick={handlePreviusMonth} title="Previous month" >
             <CaretLeft />
           </button>
-          <button>
+          <button onClick={handleNextMonth} title="Next month" >
             {" "}
             <CaretRight />{" "}
           </button>
@@ -42,7 +63,7 @@ export function Calendar() {
             <td></td>
             <td></td>
             <td>
-              <CalendarDay disabled >1</CalendarDay>
+              <CalendarDay disabled>1</CalendarDay>
             </td>
             <td>
               <CalendarDay>2</CalendarDay>
