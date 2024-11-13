@@ -10,6 +10,7 @@ import {
 import { getWeekDays } from "../../utils/get-week-days";
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
+import { date } from "zod";
 
 interface CalendarWeek {
   week: number;
@@ -21,7 +22,12 @@ interface CalendarWeek {
 
 type CalendarWeeks = CalendarWeek[];
 
-export function Calendar() {
+interface CalendarProps {
+  selectedDate: Date | null;
+  onDateSelected: (date: Date) => void;
+}
+
+export function Calendar({ selectedDate, onDateSelected }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(() => {
     return dayjs().set("date", 1);
   });
@@ -64,18 +70,18 @@ export function Calendar() {
     );
     const lastWeekDay = lastDayInCurrentMonth.get("day");
 
-       const nextMonthFillArray = Array.from({
-         length: 7 - (lastWeekDay + 1),
-       }).map((_, i) => {
-         return lastDayInCurrentMonth.add(i + 1, "day");
-       });
+    const nextMonthFillArray = Array.from({
+      length: 7 - (lastWeekDay + 1),
+    }).map((_, i) => {
+      return lastDayInCurrentMonth.add(i + 1, "day");
+    });
 
     const calendarDays = [
       ...previousMonthFillArray.map((date) => {
         return { date, disabled: true };
       }),
       ...daysInMonthArray.map((date) => {
-        return { date, disabled: false };
+        return { date, disabled: date.endOf("day").isBefore(new Date()) };
       }),
       ...nextMonthFillArray.map((date) => {
         return { date, disabled: true };
@@ -101,7 +107,7 @@ export function Calendar() {
     return calendarWeeks;
   }, [currentDate]);
 
-  console.log(calendarWeeks);
+  // console.log(calendarWeeks);
 
   return (
     <CalendarContainer>
@@ -129,16 +135,18 @@ export function Calendar() {
         <tbody>
           {calendarWeeks.map(({ week, days }) => (
             <tr key={week}>
-              {days.map(({date, disabled}) => (
+              {days.map(({ date, disabled }) => (
                 <td key={date.toString()}>
-                  <CalendarDay disabled={disabled}>
+                  <CalendarDay
+                    onClick={() => onDateSelected(date.toDate())}
+                    disabled={disabled}
+                  >
                     {date.get("date")}
                   </CalendarDay>
                 </td>
               ))}
             </tr>
           ))}
-         
         </tbody>
       </CalendarBody>
     </CalendarContainer>
