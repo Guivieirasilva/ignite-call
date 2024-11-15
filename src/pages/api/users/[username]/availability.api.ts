@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../../lib/prisma";
+import { use } from "react";
 
 export default async function handler(
   req: NextApiRequest,
@@ -56,5 +57,24 @@ export default async function handler(
     }
   );
 
-  return res.json({ possibleTimes });
+  const bleckedTimes = await prisma.scheduling.findMany({
+    select:{
+      date: true
+    },
+    where: {
+      user_id: user.id,
+      date: {
+        gte: referenceDate.set("hour", startHour).toDate(),
+        lte: referenceDate.set("hour", endHour).toDate(),
+      },
+    },
+  });
+
+  const availableTimes = possibleTimes.filter((time) => {
+    return !bleckedTimes.some(
+      (blockedtime) => blockedtime.date.getHours() === time
+    );
+  });
+
+  return res.json({ possibleTimes, availableTimes });
 }
