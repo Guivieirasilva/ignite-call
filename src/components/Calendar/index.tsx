@@ -126,12 +126,13 @@ export function Calendar({ selectedDate, onDateSelected }: CalendarProps) {
         </CalendarActions>
       </CalendarHeader>
       <CalendarBody>
-        <thead></thead>
-        <tr>
-          {shortWeekDays.map((weekday) => (
-            <th key={weekday}>{weekday}.</th>
-          ))}
-        </tr>
+        <thead>
+          <tr>
+            {shortWeekDays.map((weekday) => (
+              <th key={weekday}>{weekday}.</th>
+            ))}
+          </tr>
+        </thead>
         <tbody>
           {calendarWeeks.map(({ week, days }) => (
             <tr key={week}>
