@@ -10,6 +10,7 @@ import {
 import dayjs from "dayjs";
 import { api } from "../../../../../lib/axios";
 import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
 
 interface Availability {
   possibleTimes: number[];
@@ -18,7 +19,7 @@ interface Availability {
 
 export function CalendarStep() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [availability, setAvailability] = useState<Availability | null>(null);
+  // const [availability, setAvailability] = useState<Availability | null>(null);
   const router = useRouter();
   const username = String(router.query.username);
 
@@ -29,27 +30,39 @@ export function CalendarStep() {
     ? dayjs(selectedDate).format("DD [de] MMMM")
     : null;
 
-  const dateFormatResquest = dayjs(selectedDate).format("YYYY-MM-DD");
+  const selectedDateWithoutTime = selectedDate
+    ? dayjs(selectedDate).format("YYYY-MM-DD")
+    : null;
 
-  async function getHoursAvailability() {
-    if (!selectedDate) {
-      return;
-    }
-    try {
+  const { data: availability } = useQuery<Availability>({
+    queryKey: ["availability", selectedDateWithoutTime],
+    queryFn: async () => {
       const response = await api.get(`/users/${username}/availability`, {
         params: {
-          date: dateFormatResquest,
+          date: selectedDateWithoutTime,
         },
       });
-      setAvailability(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
-  useEffect(() => {
-    getHoursAvailability();
-  }, [selectedDate, username]);
+      return response.data;
+    },
+    enabled: !!selectedDate,
+  });
+
+  // async function getHoursAvailability() {
+  //   if (!selectedDate) {
+  //     return;
+  //   }
+  //   try {
+
+  //     setAvailability(response.data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   getHoursAvailability();
+  // }, [selectedDate, username]);
 
   return (
     <Container isTimePickerOpen={isDateSelected}>
