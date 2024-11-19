@@ -19,7 +19,6 @@ interface Availability {
 
 export function CalendarStep() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  // const [availability, setAvailability] = useState<Availability | null>(null);
   const router = useRouter();
   const username = String(router.query.username);
 
@@ -47,22 +46,6 @@ export function CalendarStep() {
     },
     enabled: !!selectedDate,
   });
-
-  // async function getHoursAvailability() {
-  //   if (!selectedDate) {
-  //     return;
-  //   }
-  //   try {
-
-  //     setAvailability(response.data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   getHoursAvailability();
-  // }, [selectedDate, username]);
 
   return (
     <Container isTimePickerOpen={isDateSelected}>
