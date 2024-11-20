@@ -78,6 +78,10 @@ export function Calendar({ selectedDate, onDateSelected }: CalendarProps) {
   });
 
   const calendarWeeks = useMemo(() => {
+
+    if(!blockedDates) {
+      return []
+    }
     const daysInMonthArray = Array.from({
       length: currentDate.daysInMonth(),
     }).map((_, i) => {
@@ -130,7 +134,7 @@ export function Calendar({ selectedDate, onDateSelected }: CalendarProps) {
         if (isNewWeek) {
           weeks.push({
             week: i / 7 + 1,
-            days: original.slice(i, i + 7) as any ,
+            days: original.slice(i, i + 7),
           });
         }
 

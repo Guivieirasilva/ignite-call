@@ -27,14 +27,14 @@ export default async function handler(
     return res.status(400).json({ message: "User does not exist." });
   }
 
-    const availableWeekDays = await prisma.userTimeInterval.findMany({
-      select: {
-        week_day: true,
-      },
-      where: {
-        user_id: user.id,
-      },
-    });
+  const availableWeekDays = await prisma.userTimeInterval.findMany({
+    select: {
+      week_day: true,
+    },
+    where: {
+      user_id: user.id,
+    },
+  });
 
   const blockedWeekDays = [0, 1, 2, 3, 4, 5, 6].filter((weekDay) => {
     return !availableWeekDays.some(
@@ -42,5 +42,14 @@ export default async function handler(
     );
   });
 
-  return res.json({ blockedWeekDays });
+  const blockedDatesRaw = await prisma.$queryRaw`
+    SELECT * 
+    FROM schedulings S
+
+    WHERE S.user_id = ${user.id}
+      AND DATE_FORMAT(S.date, "%Y-%m") = ${`${year}-${month}`}
+    
+    `;
+
+  return res.json({ blockedWeekDays, blockedDatesRaw });
 }
