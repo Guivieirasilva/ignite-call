@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { convertTimeStringToMinutes } from "../../../utils/convert-time-string-to-minutes";
 import { api } from "../../../lib/axios";
 import { useRouter } from "next/router";
+import { NextSeo } from "next-seo";
 
 const timeIntervalsFormSchema = z.object({
   intervals: z
@@ -109,74 +110,77 @@ export default function TimeIntervals() {
   }
 
   return (
-    <Container>
-      <Header>
-        <Heading as="strong">Quase lá</Heading>
-        <Text>
-          Defina o intervalo de horários que você está disponível em cada dia da
-          semana.
-        </Text>
+    <>
+      <NextSeo title="Selecione sua disponibilidade | Ignite Call " noindex />
+      <Container>
+        <Header>
+          <Heading as="strong">Quase lá</Heading>
+          <Text>
+            Defina o intervalo de horários que você está disponível em cada dia
+            da semana.
+          </Text>
 
-        <MultiStep size={4} currentStep={3} />
-      </Header>
-      <IntervalBox as="form" onSubmit={handleSubmit(handleSetTimeIntervals)}>
-        <IntervalsContainer>
-          {fields.map((field, idx) => {
-            return (
-              <IntervalItem key={field.id}>
-                <IntervalDay>
-                  <Controller
-                    name={`intervals.${idx}.enabled`}
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked === true);
-                          }}
-                        />
-                      );
-                    }}
-                  />
-                  <Text>{weekDays[field.weekDay]}</Text>{" "}
-                </IntervalDay>
-                <IntervalInput>
-                  <TextInput
-                    type="time"
-                    size="sm"
-                    step={60}
-                    onPointerEnterCapture={undefined}
-                    onPointerLeaveCapture={undefined}
-                    crossOrigin={undefined}
-                    disabled={interVals[idx].enabled === false}
-                    {...register(`intervals.${idx}.startTime`)}
-                  />
-                  <TextInput
-                    type="time"
-                    size="sm"
-                    step={60}
-                    onPointerEnterCapture={undefined}
-                    onPointerLeaveCapture={undefined}
-                    crossOrigin={undefined}
-                    disabled={interVals[idx].enabled === false}
-                    {...register(`intervals.${idx}.endTime`)}
-                  />
-                </IntervalInput>
-              </IntervalItem>
-            );
-          })}
-        </IntervalsContainer>
+          <MultiStep size={4} currentStep={3} />
+        </Header>
+        <IntervalBox as="form" onSubmit={handleSubmit(handleSetTimeIntervals)}>
+          <IntervalsContainer>
+            {fields.map((field, idx) => {
+              return (
+                <IntervalItem key={field.id}>
+                  <IntervalDay>
+                    <Controller
+                      name={`intervals.${idx}.enabled`}
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked === true);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                    <Text>{weekDays[field.weekDay]}</Text>{" "}
+                  </IntervalDay>
+                  <IntervalInput>
+                    <TextInput
+                      type="time"
+                      size="sm"
+                      step={60}
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                      crossOrigin={undefined}
+                      disabled={interVals[idx].enabled === false}
+                      {...register(`intervals.${idx}.startTime`)}
+                    />
+                    <TextInput
+                      type="time"
+                      size="sm"
+                      step={60}
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                      crossOrigin={undefined}
+                      disabled={interVals[idx].enabled === false}
+                      {...register(`intervals.${idx}.endTime`)}
+                    />
+                  </IntervalInput>
+                </IntervalItem>
+              );
+            })}
+          </IntervalsContainer>
 
-        {errors.intervals && (
-          <FormError size="sm">{errors.intervals.root?.message}</FormError>
-        )}
+          {errors.intervals && (
+            <FormError size="sm">{errors.intervals.root?.message}</FormError>
+          )}
 
-        <Button type="submit" disabled={isSubmitting}>
-          Próximo passo
-          <ArrowRight />
-        </Button>
-      </IntervalBox>
-    </Container>
+          <Button type="submit" disabled={isSubmitting}>
+            Próximo passo
+            <ArrowRight />
+          </Button>
+        </IntervalBox>
+      </Container>
+    </>
   );
 }
